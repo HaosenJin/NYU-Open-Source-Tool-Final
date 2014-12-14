@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+<head>
+<link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+<script src="/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="/js/jquery.validate.js" type="text/javascript"></script>
+<script type="text/javascript">
+$().ready(function() {
+	 $("#createAnswerForm").validate({
+	        rules: {
+	   aname: "required",
+	   acontent: "required",
+	  }
+  	});
+  });
+</script>
+</head>
+<body>
+	<!-- this is header part  -->
+	<div class="global_header">
+		<div class="header_inner">
+			<a href="/" class="headerlink">View Questions</a> <a
+				href="/view_image" class="headerlink">View All Images</a>
+			<div class="inner_bar">
+				{% if user %} <span><b>Hello, {{ user.nickname() }}</b></span> {%
+				endif %} <a href="{{ url|safe }}">{{ url_linktext }}</a>
+			</div>
+			<div style="clear: both"></div>
+		</div>
+	</div>
+	<!-- this is body part  -->
+	<form action="/save_answer?{{ query_params }}" method="post"
+		id="createAnswerForm">
+		<div class="wrap">
+			<div class="tbHeader">What's your answer?</div>
+			<table class="qtable">
+				<tr>
+					<td>Answer Name:</td>
+					<td><input name="aname" type="text" value="{{ aname }}" /></td>
+				</tr>
+
+				<tr>
+					<td>Answer Content:</td>
+					<td><textarea name="acontent" rows="5" cols="60">{{ acontent }}</textarea></td>
+				</tr>
+
+			</table>
+
+			<div>
+				<input type="submit" value="{{ create_btn_txt }}" class="createbtn">
+			</div>
+
+		</div>
+	</form>
+	<!-- this is foot part  -->
+	<div class="footer"></div>
+
+</body>
+</html>
+{% endautoescape %}

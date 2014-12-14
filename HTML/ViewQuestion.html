@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+<head>
+<link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+<script src="/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="/js/jquery.validate.js" type="text/javascript"></script>
+<script type="text/javascript">
+</script>
+</head>
+<body>
+	<div class="global_header">
+		<div class="header_inner">
+			<a href="/" class="headerlink">View All Questions</a> <a
+				href="/view_image" class="headerlink">View Images</a>
+			<div class="inner_bar">
+				{% if user %} <span><b>Hello, {{ user.nickname() }}</b></span> {%
+				endif %} <a href="{{ url|safe }}">{{ url_linktext }}</a>
+			</div>
+			<div style="clear: both"></div>
+		</div>
+	</div>
+
+	<div class="wrap">
+		<form action="/vote_question?qid={{ question.key.urlsafe() }}"
+			method="post">
+			<div class="tbHeader">Question:</div>
+			<table class="list_table" CellSpacing=0>
+				<tr>
+					<td>Question Creator</td>
+					<td>Question Name</td>
+					<td>Create Time</td>
+					<td>Last Modify Time</td>
+					<td>Vote</td>
+					<td>Edit</td>
+					<td>Up</td>
+					<td>Down</td>
+				</tr>
+				<tr>
+					<td>{{ question.author.nickname() }}</td>
+					<td>{{ question.name }}</td>
+					<td>{{ question.create_time }}</td>
+					<td>{{ question.modify_time }}</td>
+					<td>{{ qvote }}</td> {% if user %}
+					<td>{% if user.nickname()==question.author.nickname() %} <a
+						href="/create_question?qid={{ question.key.urlsafe() }}"
+						class="vote">Edit</a> {% endif %}
+					</td>
+					<td><input type="submit" name="vote" class="vote" value="up">
+					</td>
+					<td><input type="submit" name="vote" class="vote" value="down"></td>
+					{% endif %}
+				</tr>
+				<tr>
+					<td class="content" colspan="8">{{ question.content }}</td>
+				</tr>
+			</table>
+		</form>
+
+		{% if imgcount>0 %}
+		<div class="tbHeader">Question Images:</div>
+		<table class="qtable">
+			{% for img in images%}
+			<tr>
+				<td></td>
+				<td><img src="/img_question?img_id={{ img.key.urlsafe() }}" /></td>
+			</tr>
+			{% endfor %}
+		</table>
+		{% endif %}
+
+		<form action="/vote_answer?qid={{ question.key.urlsafe() }}"
+			method="post">
+			<div class="tbHeader">Answers:</div>
+			<table class="list_table" CellSpacing=0>
+				<tr>
+					<td>Answer Creator</td>
+					<td>Answer Name</td>
+					<td>Create Time</td>
+					<td>Last Modify Time</td>
+					<td>Vote</td>
+					<td>Edit</td>
+					<td>Up</td>
+					<td>Down</td>
+				</tr>
+				{% for answer in answers %}
+				<tr>
+					<td>{{ answer.author.nickname() }}</td>
+					<td>{{ answer.name }}</td>
+					<td>{{ answer.create_time }}</td>
+					<td>{{ answer.modify_time }}</td>
+					<td>{{ answer.vote }}</td> {% if user %}
+					<td>{% if user %}{% if
+						user.nickname()==answer.author.nickname() %} <a
+						href="/create_answer?qid={{ question.key.urlsafe() }}&aid={{ answer.key.urlsafe() }}"
+						class="vote">Edit</a> {% endif %}{% endif %}
+					</td>
+					<td><button type="submit" name="vote" class="vote"
+							value="up===={{ answer.key.urlsafe() }}">up</button></td>
+					<td><button type="submit" name="vote" class="vote"
+							value="down===={{ answer.key.urlsafe() }}">down</button></td> {% endif
+					%}
+				</tr>
+				<tr>
+					<td colspan="8" class="content">{{ answer.content }}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</form>
+	</div>
+	<div class="btncontainer">
+		<a href="/create_answer?{{ query_params }}" class="createbtn">Create
+			New Answer</a>
+	</div>
+	<div class="footer"></div>
+</body>
+</html>
+{% endautoescape %}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+<head>
+<link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+<script src="/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="/js/jquery.validate.js" type="text/javascript"></script>
+<script src="/js/additional-methods.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+$("document").ready(function() {  
+	  // add validate rule  question name and question content are required     
+	 $("#createImageForm").validate();
+  		// add validate rule to the each file uploader control which has css class inputfile
+  		// the rule is that all the file must be image files
+  		jQuery.validator.addClassRules("inputfile", {
+             accept: "image/*"
+         });
+   	// dynamically create new file upload control
+  	next_id = 4;
+     $("#add_img").click(function () {
+         filename = "img" + next_id;
+         newElement = "<tr><td>Image "+ next_id +" :  </td><td><input type=\"file\" name=" + filename + " class=\"inputfile\"/></td></tr>";
+         $("#upload_table").append(newElement);
+         $("#img_names").attr("value", $("#img_names").attr("value") + ";" + filename);
+         next_id = next_id + 1;
+     });
+  });
+</script>
+</head>
+<body>
+	<div class="global_header">
+		<div class="header_inner">
+			<a href="/" class="headerlink">View All Questions</a> <a
+				href="/view_image" class="headerlink">View Images</a>
+			<div class="inner_bar">
+				{% if user %} <span><b>Hello, {{ user.nickname() }}</b></span> {%
+				endif %} <a href="{{ url|safe }}">{{ url_linktext }}</a>
+			</div>
+			<div style="clear: both"></div>
+		</div>
+	</div>
+
+	<div class="wrap">
+		{% if imgcount>0 %}
+		<div class="tbHeader">Existing Images:</div>
+		<table class="qtable">
+			{% for img in images%}
+			<tr>
+				<td></td>
+				<td><img src="{{ img }}" /></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><b>Copy this URL and post it:</b></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><b>{{ img }}.jpg</b></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>&nbsp;</td>
+			</tr>
+			{% endfor %}
+		</table>
+		{% endif %}
+
+		<div class="page_container">
+			{% if prev_page > 0 %} <a href="/view_image?{{ prev_page_params }}"
+				class="previous">previous</a> {% endif %} {% if next_page <=
+			total_page %} <a href="/view_image?{{ next_page_params }}"
+				class="next">next</a> {% endif %}
+		</div>
+		<div style="clear: both;"></div>
+		<form action="{{ upload_url }}" method="post"
+			enctype="multipart/form-data" id="createImageForm">
+			<div class="tbHeader">Upload New Images:</div>
+			<table class="qtable" id="upload_table">
+				<tr>
+					<td>Image 1 :</td>
+					<td><input type="file" name="img1" class="inputfile" /></td>
+				</tr>
+				<tr>
+					<td>Image 2 :</td>
+					<td><input type="file" name="img2" class="inputfile" /></td>
+				</tr>
+				<tr>
+					<td>Image 3 :</td>
+					<td><input type="file" name="img3" class="inputfile" /></td>
+				</tr>
+			</table>
+			<div class="page_container">
+				<input type="hidden" name="img_names" id="img_names"
+					value="img1;img2;img3" /> <input type="button" id="add_img"
+					value="Add More Image" class="addfile" />
+			</div>
+			<div>
+				<input type="submit" value="Upload Image" class="createbtn">
+			</div>
+		</form>
+	</div>
+	<div class="footer"></div>
+</body>
+</html>
+{% endautoescape %}

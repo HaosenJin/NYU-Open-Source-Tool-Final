@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+<head>
+<link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+<script src="/js/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="/js/jquery.validate.js" type="text/javascript"></script>
+<script src="/js/additional-methods.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+function resize() {
+    var w = 800;
+    $("img").each(function () {
+        var img_w = $(this).width();
+        var img_h = $(this).height();
+        if (img_w > w) {
+            var height = (w * img_h) / img_w; 
+            $(this).css({ "width": w, "height": height });
+        }
+    });
+}
+
+$("document").ready(function() {  
+	  // add validate rule  question name and question content are required     
+	 $("#createQuestionForm").validate({
+	        rules: {
+	   qname: "required",
+	   qcontent: "required"
+	  }
+  	});
+  		// add validate rule to the each file uploader control which has css class inputfile
+  		// the rule is that all the file must be image files
+  		jQuery.validator.addClassRules("inputfile", {
+             accept: "image/*"
+         });
+   	// dynamically create new file upload control
+  	next_id = 4;
+     $("#add_img").click(function () {
+         filename = "img" + next_id;
+         newElement = "<tr><td>Image "+ next_id +" :  </td><td><input type=\"file\" name=" + filename + " class=\"inputfile\"/></td></tr>";
+         $("#upload_table").append(newElement);
+         $("#img_names").attr("value", $("#img_names").attr("value") + ";" + filename);
+         next_id = next_id + 1;
+     });
+  });
+</script>
+</head>
+<body>
+	<div class="global_header">
+		<div class="header_inner">
+			<a href="/" class="headerlink">View All Questions</a>
+			<a href="/view_image" class="headerlink">View Images</a>
+			<div class="inner_bar">
+				{% if user %} <span><b>Hello, {{ user.nickname() }}</b></span> {%
+				endif %} <a href="{{ url|safe }}">{{ url_linktext }}</a>
+			</div>
+			<div style="clear: both"></div>
+		</div>
+	</div>
+	<div class="wrap">
+		<form action="/save_question?{{ query_params }}" method="post"
+			enctype="multipart/form-data" id="createQuestionForm">
+			<div class="tbHeader">What's your question?</div>
+			<table class="qtable">
+				<tr>
+					<td>Question Name:</td>
+					<td><input name="qname" type="text" value="{{ qname }}" /></td>
+				</tr>
+				<tr>
+					<td>Tags:</td>
+					<td><input name="qtag" type="text" value="{{ qtag }}" /><span><b>Use
+								semi-colon " ; " to separate multiple tags</b></span></td>
+				</tr>
+				<tr>
+					<td>Question Content:</td>
+					<td><textarea name="qcontent" rows="5" cols="60">{{ qcontent }}</textarea></td>
+				</tr>
+			</table>
+			{% if imgcount>0 %}
+			<div class="tbHeader">Question Images:</div>
+			<table class="qtable">
+				{% for img in images%}
+				<tr>
+					<td></td>
+					<td><img src="/img_question?img_id={{ img.key.urlsafe() }}" /></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><a
+						href="/delete_image?img_id={{ img.key.urlsafe() }}&{{query_params}}"
+						class="searchbtn">Delete</a></td>
+				</tr>
+				{% endfor %}
+			</table>
+			{% endif %}
+			<div class="tbHeader">Upload New Images:</div>
+			<table class="qtable" id="upload_table">
+				<tr>
+					<td>Image 1 :</td>
+					<td><input type="file" name="img1" class="inputfile" /></td>
+				</tr>
+				<tr>
+					<td>Image 2 :</td>
+					<td><input type="file" name="img2" class="inputfile" /></td>
+				</tr>
+				<tr>
+					<td>Image 3 :</td>
+					<td><input type="file" name="img3" class="inputfile" /></td>
+				</tr>
+			</table>
+			<div class="page_container">
+				<input type="hidden" name="img_names" id="img_names"
+					value="img1;img2;img3" /> <input type="button" id="add_img"
+					value="Add More Image" class="addfile" />
+			</div>
+
+			<div>
+				<input type="submit" value="{{ create_btn_txt }}" class="createbtn">
+			</div>
+		</form>
+	</div>
+	<div class="footer"></div>
+</body>
+</html>
+{% endautoescape %}
