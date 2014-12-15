@@ -11,7 +11,7 @@ import QuestionHandler
 import AnswerHandler
 import ImageHandler
 
-from DataModel import Question, Tag
+from DataModel import Question, Tag, QVote, AVote, Answer
 from Utility import Formater
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -95,11 +95,68 @@ class MainPage(webapp2.RequestHandler):
         page_str = self.request.get('page_num', '1')
         page_num = string.atoi(page_str)
         generate(self, tags, page_num)
-        
 
+        
+class RSSXML(webapp2.RequestHandler):              
+    def get(self):
+        output = []
+        output.append("<questions>") 
+        allquestions = Question.query().order(-Question.modify_time)
+        for question in allquestions:
+            output.append("<question>")
+            output.append("<author>"+question.author.nickname()+"</author>")    
+            output.append("<name>"+question.name+"</name>")  
+            output.append("<content>"+question.content+"</content>")  
+            output.append("<createTime>"+str(question.create_time)+"</createTime>") 
+            output.append("<modifyTime>"+str(question.modify_time)+"</modifyTime>")
+            
+            # generate tag information
+            tags = question.tags.split(";")
+            output.append("<tags>");
+            for tag in tags:
+                output.append("<tag>"+tag+"</tag>")
+            output.append("</tags>");
+            
+            # generate question vote information    
+            output.append("<questionVotes>");
+            for vote in QVote.query(ancestor=question.key):
+                output.append("<vote>")
+                output.append("<author>"+vote.author.nickname()+"</author>")
+                output.append("<content>"+vote.vote+"</content>")    
+                output.append("</vote>")
+            output.append("</questionVotes>");   
+                     
+            #generate answers
+            output.append("<answers>");  
+            for answer in Answer.query(ancestor=question.key):
+                output.append("<answer>");
+                output.append("<author>"+answer.author.nickname()+"</author>")
+                output.append("<name>"+answer.name+"</name>")  
+                output.append("<content>"+answer.content+"</content>")  
+                output.append("<createTime>"+str(answer.create_time)+"</createTime>") 
+                output.append("<modifyTime>"+str(answer.modify_time)+"</modifyTime>")
+                
+                # generate answer vote information   
+                output.append("<answerVotes>");
+                for vote in AVote.query(ancestor=answer.key):
+                    output.append("<vote>")
+                    output.append("<author>"+vote.author.nickname()+"</author>")
+                    output.append("<content>"+vote.vote+"</content>")    
+                    output.append("</vote>")
+                output.append("</answerVotes>");            
+                output.append("</answer>");    
+            output.append("</answers>");     
+            output.append("</question>")    
+        output.append("</questions>")         
+        xml = ''
+        for s in output:
+            xml = xml +s
+        self.response.headers['Content-Type'] = 'Text/XML'        
+        self.response.write(xml)
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
+    ('/RSS', RSSXML),
     ('/create_question', QuestionHandler.CreateQuestionPage),
     ('/save_question', QuestionHandler.SaveQuestionPage),
     ('/view_question', QuestionHandler.ViewQuestionPage),
