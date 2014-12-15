@@ -30,9 +30,10 @@ $("document").ready(function() {
 <body>
 	<div class="global_header">
 		<div class="header_inner">
-			<a href="/" class="headerlink">Questions</a> <a
-				href="/view_image" class="headerlink">Images</a> <a
-				href="/RSS" class="headerlink">RSS</a>
+			<a href="/" class="headerlink">Questions</a> <a href="/view_image"
+				class="headerlink">Images</a>
+			<!--  <a
+				href="/RSS" class="headerlink">RSS</a>-->
 			<div class="inner_bar">
 				{% if user %} <span><b>Hello, {{ user.nickname() }}</b></span> {%
 				endif %} <a href="{{ url|safe }}">{{ url_linktext }}</a>
