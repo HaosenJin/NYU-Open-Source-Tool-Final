@@ -11,9 +11,8 @@
 <body>
 	<div class="global_header">
 		<div class="header_inner">
-			<a href="/" class="headerlink">Questions</a> <a
-				href="/view_image" class="headerlink">Images</a> <a
-				href="/RSS" class="headerlink">RSS</a>
+			<a href="/" class="headerlink">Questions</a> <a href="/view_image"
+				class="headerlink">Images</a> <a href="/RSS" class="headerlink">RSS</a>
 			<div class="inner_bar">
 				{% if user %} <span><b>Hello, {{ user.nickname() }}</b></span> {%
 				endif %} <a href="{{ url|safe }}">{{ url_linktext }}</a>
@@ -42,15 +41,19 @@
 					<td>{{ question.name }}</td>
 					<td>{{ question.create_time }}</td>
 					<td>{{ question.modify_time }}</td>
-					<td>{{ qvote }}</td> {% if user %}
-					<td>{% if user.nickname()==question.author.nickname() %} <a
+					<td>{{ qvote }}</td>
+					<td>{% if user %} {% if
+						user.nickname()==question.author.nickname() %} <a
 						href="/create_question?qid={{ question.key.urlsafe() }}"
-						class="vote">Edit</a> {% endif %}
+						class="vote">Edit</a> {% endif %}{% endif %}
 					</td>
-					<td><input type="submit" name="vote" class="vote" value="up">
+					<td>{% if user %}<input type="submit" name="vote" class="vote"
+						value="up"> {% endif %}
 					</td>
-					<td><input type="submit" name="vote" class="vote" value="down"></td>
-					{% endif %}
+					<td>{% if user %}<input type="submit" name="vote" class="vote"
+						value="down">{% endif %}
+					</td>
+
 				</tr>
 				<tr>
 					<td class="content" colspan="8">{{ question.content }}</td>
@@ -90,17 +93,21 @@
 					<td>{{ answer.name }}</td>
 					<td>{{ answer.create_time }}</td>
 					<td>{{ answer.modify_time }}</td>
-					<td>{{ answer.vote }}</td> {% if user %}
+					<td>{{ answer.vote }}</td>
 					<td>{% if user %}{% if
 						user.nickname()==answer.author.nickname() %} <a
 						href="/create_answer?qid={{ question.key.urlsafe() }}&aid={{ answer.key.urlsafe() }}"
 						class="vote">Edit</a> {% endif %}{% endif %}
 					</td>
-					<td><button type="submit" name="vote" class="vote"
-							value="up===={{ answer.key.urlsafe() }}">up</button></td>
-					<td><button type="submit" name="vote" class="vote"
-							value="down===={{ answer.key.urlsafe() }}">down</button></td> {% endif
-					%}
+					<td>{% if user %}
+						<button type="submit" name="vote" class="vote"
+							value="up===={{ answer.key.urlsafe() }}">up</button>{% endif %}
+					</td>
+					<td>{% if user %}
+						<button type="submit" name="vote" class="vote"
+							value="down===={{ answer.key.urlsafe() }}">down</button>{% endif
+						%}
+					</td>
 				</tr>
 				<tr>
 					<td colspan="8" class="content">{{ answer.content }}</td>
