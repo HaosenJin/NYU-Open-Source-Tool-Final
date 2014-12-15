@@ -109,8 +109,8 @@ class SaveQuestionPage(webapp2.RequestHandler):
 
 class ViewQuestionPage(webapp2.RequestHandler):
     def get(self):
-        qid = self.request.get('qid')
-        if qid == '':
+        qid = self.request.get('qid','1')
+        if qid == '1':
             self.redirect('/')        
         if users.get_current_user():
             url = users.create_logout_url(self.request.uri)
@@ -145,8 +145,10 @@ class ViewQuestionPage(webapp2.RequestHandler):
             a.vote = up - down
             a.difference = abs(up - down)
             a.content = jinja2.Markup(Formater.format_html_content(a.content))
-            answers_reorder.append(a)            
-        answers_reorder.sort(key=lambda a:a.difference, reverse=True)
+            answers_reorder.append(a)
+            
+        if len(answers_reorder) > 0:            
+            answers_reorder.sort(key=lambda a:a.difference, reverse=True)
         
         # get question images 
         images = QuestionImage.query(ancestor=qkey).order(-QuestionImage.create_time)   
