@@ -153,6 +153,10 @@ class RSSXML(webapp2.RequestHandler):
             xml = xml +s
         self.response.headers['Content-Type'] = 'Text/XML'        
         self.response.write(xml)
+        
+        
+        
+        
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
