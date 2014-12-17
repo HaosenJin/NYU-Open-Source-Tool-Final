@@ -3,7 +3,9 @@ import urllib
 import string
 import jinja2
 import webapp2
+import smtplib
 
+from google.appengine.api import mail
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from DataModel import Answer, AVote
@@ -68,14 +70,24 @@ class SaveAnswerPage(webapp2.RequestHandler):
         
         if aid == '':
             answer = Answer(parent=qkey)
+            sendEmail = True
         else:
+            sendEmail = False
             akey = ndb.Key(urlsafe=aid)
             answer = akey.get()
             
         answer.author = users.get_current_user()
         answer.name = aname
         answer.content = acontent
-        answer.put()        
+        answer.put()
+        if sendEmail:
+            question = qkey.get()
+            receiverEmailAddr = question.author.email()
+            senderEmailAddr = users.get_current_user().email()
+            if mail.is_email_valid(receiverEmailAddr) and mail.is_email_valid(senderEmailAddr) and receiverEmailAddr != senderEmailAddr:
+                subject = "You have a new answer"
+                content = """ Your question (Question name: """ + question.name + """, Question content: """ + question.content + """) has a new answer. """
+                mail.send_mail(senderEmailAddr, receiverEmailAddr, subject, content)                                       
         self.redirect('/view_question?%s' % urllib.urlencode(query_params))
                 
 class VoteAnswerPage(webapp2.RequestHandler):
@@ -97,7 +109,7 @@ class VoteAnswerPage(webapp2.RequestHandler):
                 avoteList.append(v)
             avote = avoteList[0]
         else:
-            avote =AVote(parent=akey)
+            avote = AVote(parent=akey)
         avote.vote = vote
         avote.author = user
         avote.put()
